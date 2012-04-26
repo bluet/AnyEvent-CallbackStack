@@ -1,5 +1,7 @@
 Revision history for AnyEvent-CallbackStack
 
+0.02    2012-04-26 17:20:10 UTC+8
+        minor fix
 0.01    2012-04-26 12:23:04 UTC+8
         First version, released on an unsuspecting world.
 

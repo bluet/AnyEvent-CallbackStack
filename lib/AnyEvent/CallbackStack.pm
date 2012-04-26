@@ -1,7 +1,7 @@
 package AnyEvent::CallbackStack;
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use utf8;
 use feature 'say';
@@ -17,7 +17,7 @@ my $step;
 =encoding utf-8
 =head1 NAME
 
-AnyEvent::CallbackStack - Convert nested callback into easy-to-read-write-and-maintain serial/procedual coding style by using Callback Stack.
+AnyEvent::CallbackStack - Convert nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
 
 =head1 SYNOPSIS
 
