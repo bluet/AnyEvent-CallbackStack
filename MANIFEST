@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/AnyEvent/CallbackStack.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/10-basic-add-start.t
+t/10-start-add-cv-cb.t
