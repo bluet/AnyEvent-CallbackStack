@@ -1,5 +1,7 @@
 Revision history for AnyEvent-CallbackStack
 
+0.05    2012-04-27 02:27:52 UTC+8
+        add AE::CS API, fix unit test script
 0.04    2012-04-26 19:53:47 UTC+8
         add SEE ALSO
 0.03    2012-04-26 17:51:44 UTC+8

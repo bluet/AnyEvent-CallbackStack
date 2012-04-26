@@ -1,79 +1,64 @@
-package AnyEvent::CallbackStack;
+package AE::CS;
 
+use AnyEvent::CallbackStack;
 
-our $VERSION = '0.05';
-
-use utf8;
-use feature 'say';
-use common::sense;
-use Data::Dumper::Simple;
-
-use AnyEvent;
-use constant DEBUG => $ENV{ANYEVENT_CALLBACKSTACK_DEBUG};
-
-my @cbq;
-my $step;
+our $VERSION = $AnyEvent::CallbackStack::VERSION;
 
 =encoding utf8
 
 =head1 NAME
 
-AnyEvent::CallbackStack - Convert nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
+AE::CS - Shorter AnyEvent::CallbackStack API.
+
+Inspired by AE.
+Starting with version 0.05, AnyEvent::CallbackStack officially supports a second, much
+simpler in name, API that is designed to reduce the typing.
+
+There is No Magic like what AE has on reducing calling and memory overhead.
+
+See the L<AnyEvent::CallbackStack> manpage for details.
 
 =head1 SYNOPSIS
 
-Use L<AnyEvent::CallbackStack> with the following style.
+Use L<AE::CS> with the following style.
 
 	use feature 'say';
 	use AnyEvent::CallbackStack;
 	
-	my $cs = AnyEvent::CallbackStack->new();
-	$cs->start( %foo );
-	$cs->add( sub {
-		do_something;
-		$cs->next( $bar, $yohoo );
-	});
+	my $cs = AE::CS;
+	my $cv = AE::cv;
 	
-	$cv = $cs->last;
-	return $cv;
+	$cs->add( sub { $cv->send( $_[0]->recv ) } );
+	$cs->start('hello world');
+	say $cv->recv;
 
 # or
 
+	my $cs = AE::CS;
 	http_get http://BlueT.org => sub { $cs->start($_[0]) };
 	$cs->add( sub { say $_[0]->recv } );
 
 # or
 
-	$cs->add( sub { say 'I got the ball'; $cs->next( $_[0]->recv ); } )
-	print 'Your name please?: ';
-	chomp(my $in = <STDIN>);
-	$cs->start($in);
-	$cs->add( sub { say "Lucky you, $_[0]->recv" } );
-
-# or
-
 	my $cs = AE::CS;
+	my %foo = (bar => vbar, yohoo => vyohoo);
+	
+	$cs->start( %foo );
+	$cs->add( sub {
+		my %foo = $_[0]->recv;
+		$cs->next( $foo{'bar'}, $foo{'yohoo'} );
+	});
+	
+	$cv = $cs->last;
+	$cv->cb( sub {
+		my @a = $_[0]->recv;
+		$cv->send( $a[0].$a[1] )
+	});
+	
+	say $cv->recv;
+
 
 =head1 METHODS
-
-=head2 new
-
-No paramater needed.
-
-	my $cs = new AnyEvent::CallbackStack;
-
-=cut
-
-sub new {
-	my $class = shift;
-	my $self  = {};
-	push @cbq, AE::cv;
-	
-	bless ($self, $class);
-	say 'NEW '.Dumper($self) if DEBUG;
-	
-	return $self;
-}
 
 =head2 start
 
@@ -81,32 +66,11 @@ Start and walk through the Callback Stack from step 0.
 
 	$cs->start( 'foo' );
 
-=cut
-
-sub start {
-	my $self = shift;
-	$step = 0;
-	
-	say 'Start '.Dumper ($self, $step, @cbq) if DEBUG;
-	$self->step($step, @_);
-}
-
 =head2 add
 
 Add (append) callback into the Callback Stack.
 
 	$cs->add( $code_ref );
-
-=cut
-
-sub add {
-	my $self = shift;
-	push @cbq, AE::cv;
-	
-	say 'ADD '.Dumper ($self, $step, @cbq) if DEBUG;
-	
-	$cbq[-2]->cb( shift );
-}
 
 =head2 next
 
@@ -117,17 +81,6 @@ Check out from the current step and pass value to the next callback in callback 
 IMPORTANT:
 Remember that only if you call this method, the next callback in stack will be triggered.
 
-=cut
-
-sub next {
-	my $self = shift;
-	$step++;
-	
-	say 'NEXT $step '.Dumper ($self, $step, @cbq) if DEBUG;
-	
-	$self->step($step, @_);
-}
-
 =head2 step
 
 Experimental.
@@ -135,17 +88,6 @@ Experimental.
 Start the callback flow from the specified step.
 
 	$cs->step( 3, @data );
-
-=cut
-
-sub step {
-	my $self = shift;
-	$step = shift;
-	
-	say 'STEP '.Dumper ($self, $step, @cbq) if DEBUG;
-	
-	$cbq[$step]->send( @_ );
-}
 
 =head2 last
 
@@ -156,46 +98,6 @@ Usually it's called when you are writing a module and need to return it to your 
 	my $cv = $cs->last;
 	# or
 	return $cs->last;
-	
-
-=cut
-
-sub last {
-	my $self = shift;
-	
-	say 'LAST '.Dumper ($self, $step, @cbq) if DEBUG;
-	
-	return $cbq[-1];
-}
-
-
-=head1 SHORTCUT AE::CS API
-
-Inspired by AE.
-Starting with version 0.05, AnyEvent::CallbackStack officially supports a second, much
-simpler in name, API that is designed to reduce the typing.
-
-There is No Magic like what AE has on reducing calling and memory overhead.
-
-See the L<AE::CS> manpage for details.
-
-	my $cs = AE::CS;
-
-=cut
-
-package AE::CS;
-
-our $VERSION = $AnyEvent::CallbackStack::VERSION;
-
-sub _reset() {
-	eval q{ # poor man's autoloading {}
-		*AE::CS = sub {
-			AnyEvent::CallbackStack->new
-		};
-	};
-	die if $@;
-}
-BEGIN { _reset }
 
 
 =head1 AUTHOR
@@ -265,3 +167,4 @@ See http://dev.perl.org/licenses/ for more information.
 =cut
 
 1; # End of AnyEvent::CallbackStack
+

@@ -4,7 +4,7 @@ use Test::Simple tests => 1;
 
 use AnyEvent::CallbackStack;
 
-my $cs = AnyEvent::CallbackStack->new;
+my $cs = AE::CS;
 my $cv = AE::cv;
 
 $cs->add( sub { $cv->send( $_[0]->recv ) } );
