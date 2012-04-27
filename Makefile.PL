@@ -5,6 +5,7 @@ all_from 'lib/AnyEvent/CallbackStack.pm';
 author   q{BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>};
 license  'perl';
 
+requires 'feature'		=> 0;
 requires 'AnyEvent'		=> 0;
 requires 'common::sense'	=> 0;
 requires 'Data::Dumper::Simple'	=> 0;

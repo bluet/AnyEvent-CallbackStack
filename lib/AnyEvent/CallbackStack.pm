@@ -1,7 +1,7 @@
 package AnyEvent::CallbackStack;
 
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use utf8;
 use feature 'say';
