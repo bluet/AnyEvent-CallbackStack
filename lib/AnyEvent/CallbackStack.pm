@@ -11,8 +11,6 @@ use Data::Dumper::Simple;
 use AnyEvent;
 use constant DEBUG => $ENV{ANYEVENT_CALLBACKSTACK_DEBUG};
 
-my @cbq;
-my $step;
 
 =encoding utf8
 
@@ -66,8 +64,14 @@ No paramater needed.
 
 sub new {
 	my $class = shift;
-	my $self  = {};
+	
+	my @cbq = ();
 	push @cbq, AE::cv;
+	
+	my $self  = {
+		cbq		=> \@cbq,
+		current_step	=> 0,
+	};
 	
 	bless ($self, $class);
 	say 'NEW '.Dumper($self) if DEBUG;
@@ -85,10 +89,10 @@ Start and walk through the Callback Stack from step 0.
 
 sub start {
 	my $self = shift;
-	$step = 0;
+	$self->current_step(0);
 	
-	say 'Start '.Dumper ($self, $step, @cbq) if DEBUG;
-	$self->step($step, @_);
+	say 'Start '.Dumper ($self) if DEBUG;
+	$self->step($self->current_step, @_);
 }
 
 =head2 add
@@ -101,11 +105,11 @@ Add (append) callback into the Callback Stack.
 
 sub add {
 	my $self = shift;
-	push @cbq, AE::cv;
+	$self->cbq(AE::cv);
 	
-	say 'ADD '.Dumper ($self, $step, @cbq) if DEBUG;
+	say 'ADD '.Dumper ($self) if DEBUG;
 	
-	$cbq[-2]->cb( shift );
+	($self->cbq)[-2]->cb( shift );
 }
 
 =head2 next
@@ -121,30 +125,11 @@ Remember that only if you call this method, the next callback in stack will be t
 
 sub next {
 	my $self = shift;
-	$step++;
+	$self->current_step( $self->current_step +1);
 	
-	say 'NEXT $step '.Dumper ($self, $step, @cbq) if DEBUG;
+	say 'NEXT $self->current_step '.Dumper ($self) if DEBUG;
 	
-	$self->step($step, @_);
-}
-
-=head2 step
-
-Experimental.
-
-Start the callback flow from the specified step.
-
-	$cs->step( 3, @data );
-
-=cut
-
-sub step {
-	my $self = shift;
-	$step = shift;
-	
-	say 'STEP '.Dumper ($self, $step, @cbq) if DEBUG;
-	
-	$cbq[$step]->send( @_ );
+	$self->step($self->current_step, @_);
 }
 
 =head2 last
@@ -163,11 +148,67 @@ Usually it's called when you are writing a module and need to return it to your 
 sub last {
 	my $self = shift;
 	
-	say 'LAST '.Dumper ($self, $step, @cbq) if DEBUG;
+	say 'LAST '.Dumper ($self) if DEBUG;
 	
-	return $cbq[-1];
+	return ($self->cbq)[-1];
 }
 
+=head2 step
+
+Experimental.
+
+Start the callback flow from the specified step.
+
+	$cs->step( 3, @data );
+
+=cut
+
+sub step {
+	my $self = shift;
+	$_[0] =~ /^\d+?$/ ? $self->current_step(shift) : die 'input is not a number in step()';
+	
+	say 'STEP '.Dumper ($self) if DEBUG;
+	
+	($self->cbq)[$self->current_step]->send( @_ );
+}
+
+=head2 cbq
+
+Experimental.
+
+Callback Queue Getter/Setter.
+
+Don't use this directly unless you really know what you're doing.
+
+	my @cbq = $cs->cbq;
+	$cs->cbq( AE::cv );
+
+=cut
+
+sub cbq {
+	my $self = shift;
+	push @{$self->{'cbq'}}, @_ if @_;
+	return @{$self->{'cbq'}};
+}
+
+=head2 current_step
+
+Experimental.
+
+'Current Step Counter' Getter/Setter.
+
+Don't use this directly unless you really know what you're doing.
+
+	my $curr_step = $cs->current_step;
+	$cs->current_step( 0 );
+
+=cut
+
+sub current_step {
+	my $self = shift;
+	$self->{'current_step'} = $_[0] if $_[0];
+	return $self->{'current_step'};
+}
 
 =head1 SHORTCUT AE::CS API
 
