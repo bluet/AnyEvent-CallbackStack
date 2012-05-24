@@ -12,6 +12,7 @@ cover_db
 cover_db/
 .git
 .gitignore
+inc*
 inc/
 .last_cover_stats
 .lwpcookies
