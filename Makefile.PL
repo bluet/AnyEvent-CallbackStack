@@ -11,9 +11,11 @@ WriteMakefile(
       ? ('LICENSE'=> 'perl')
       : ()),
     PL_FILES            => {},
+    BUILD_REQUIRES => {
+	'Test::More'		=> 0,
+	'Test::Simple'		=> 0,
+    },
     PREREQ_PM => {
-        'Test::More'		=> 0,
-        'Test::Simple'		=> 0,
         'feature'		=> 0,
 	'AnyEvent'		=> 0,
 	'common::sense'		=> 0,
