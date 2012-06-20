@@ -145,6 +145,7 @@ L<http://search.cpan.org/dist/AnyEvent-CallbackStack/>
 L<https://launchpad.net/p5-anyevent-callbackstack>
 
 =item * GitHub
+
 L<https://github.com/BlueT/AnyEvent-CallbackStack>
 
 =back
