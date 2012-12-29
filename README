@@ -1,7 +1,9 @@
 AnyEvent-CallbackStack
 ======================
 
-Convert nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
+Turning endless nested Event-Based Callbacks into plain Sequential Style. And save your indents.
+
+Convert endless nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for

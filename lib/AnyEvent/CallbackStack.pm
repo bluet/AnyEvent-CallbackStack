@@ -1,7 +1,7 @@
 package AnyEvent::CallbackStack;
 
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use utf8;
 use feature 'say';
@@ -16,7 +16,9 @@ use constant DEBUG => $ENV{ANYEVENT_CALLBACKSTACK_DEBUG};
 
 =head1 NAME
 
-AnyEvent::CallbackStack - Convert nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
+AnyEvent::CallbackStack - Turning endless nested Event-Based Callbacks into plain Sequential Style. And save your indents.
+
+Convert nested callback into easy-to-read-write-and-maintain serial/procedural coding style by using Callback Stack.
 
 =head1 SYNOPSIS
 
@@ -27,6 +29,7 @@ Use L<AnyEvent::CallbackStack> with the following style.
 	
 	my $cs = AnyEvent::CallbackStack->new();
 	$cs->start( %foo );
+
 	$cs->add( sub {
 		do_something;
 		$cs->next( $bar, $yohoo );
@@ -38,7 +41,11 @@ Use L<AnyEvent::CallbackStack> with the following style.
 # or
 
 	http_get http://BlueT.org => sub { $cs->start($_[0]) };
-	$cs->add( sub { say $_[0]->recv } );
+	$cs->add( sub { say $_[0]->recv; $cs->next } );
+	$cs->last->cb(sub {
+		# do something after that
+		# and maybe let me know someone's using my module :3
+	});
 
 # or
 
