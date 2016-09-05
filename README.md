@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/BlueT/AnyEvent-CallbackStack.svg?branch=master)](https://travis-ci.org/BlueT/AnyEvent-CallbackStack)
 AnyEvent-CallbackStack
 ======================
 
