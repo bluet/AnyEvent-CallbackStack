@@ -1,5 +1,7 @@
 =encoding utf8
 
+=for html <a href="https://travis-ci.org/BlueT/AnyEvent-CallbackStack"><img src="https://travis-ci.org/BlueT/AnyEvent-CallbackStack.svg?branch=master"></a>
+
 =head1 NAME
 
 AnyEvent::CallbackStack - Turning endless nested Event-Based Callbacks into plain Sequential Style. And save your indents.
@@ -221,4 +223,3 @@ See http://dev.perl.org/licenses/ for more information.
 
 
 =cut
-
