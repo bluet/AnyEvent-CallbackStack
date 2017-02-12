@@ -5,7 +5,6 @@ README
 lib/AnyEvent/CallbackStack.pm
 lib/AE/CS.pm
 t/00-load.t
-t/boilerplate.t
 t/10-basic-add-start.t
 t/10-basic-start-add-cv-cb.t
 t/manifest.t
