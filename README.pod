@@ -1,17 +1,3 @@
-package AnyEvent::CallbackStack;
-
-
-our $VERSION = '0.11';
-
-use utf8;
-use feature 'say';
-use common::sense;
-use Data::Dumper::Simple;
-
-use AnyEvent;
-use constant DEBUG => $ENV{ANYEVENT_CALLBACKSTACK_DEBUG};
-
-
 =encoding utf8
 
 =head1 NAME
@@ -67,24 +53,8 @@ No paramater needed.
 
 	my $cs = new AnyEvent::CallbackStack;
 
-=cut
 
-sub new {
-	my $class = shift;
-	
-	my @cbq = ();
-	push @cbq, AE::cv;
-	
-	my $self  = {
-		cbq		=> \@cbq,
-		current_step	=> 0,
-	};
-	
-	bless ($self, $class);
-	say 'NEW '.Dumper($self) if DEBUG;
-	
-	return $self;
-}
+=cut
 
 =head2 start
 
@@ -92,15 +62,8 @@ Start and walk through the Callback Stack from step 0.
 
 	$cs->start( 'foo' );
 
-=cut
 
-sub start {
-	my $self = shift;
-	$self->current_step(0);
-	
-	say 'Start '.Dumper ($self) if DEBUG;
-	$self->step($self->current_step, @_);
-}
+=cut
 
 =head2 add
 
@@ -108,16 +71,8 @@ Add (append) callback into the Callback Stack.
 
 	$cs->add( $code_ref );
 
-=cut
 
-sub add {
-	my $self = shift;
-	$self->cbq(AE::cv);
-	
-	say 'ADD '.Dumper ($self) if DEBUG;
-	
-	($self->cbq)[-2]->cb( shift );
-}
+=cut
 
 =head2 next
 
@@ -128,16 +83,8 @@ Check out from the current step and pass value to the next callback in callback 
 IMPORTANT:
 Remember that only if you call this method, the next callback in stack will be triggered.
 
-=cut
 
-sub next {
-	my $self = shift;
-	$self->current_step( $self->current_step +1);
-	
-	say 'NEXT $self->current_step '.Dumper ($self) if DEBUG;
-	
-	$self->step($self->current_step, @_);
-}
+=cut
 
 =head2 last
 
@@ -150,15 +97,8 @@ Usually it's called when you are writing a module and need to return it to your 
 	return $cs->last;
 	
 
-=cut
 
-sub last {
-	my $self = shift;
-	
-	say 'LAST '.Dumper ($self) if DEBUG;
-	
-	return ($self->cbq)[-1];
-}
+=cut
 
 =head2 step
 
@@ -168,16 +108,8 @@ Start the callback flow from the specified step.
 
 	$cs->step( 3, @data );
 
-=cut
 
-sub step {
-	my $self = shift;
-	$_[0] =~ /^\d+?$/ ? $self->current_step(shift) : die 'input is not a number in step()';
-	
-	say 'STEP '.Dumper ($self) if DEBUG;
-	
-	($self->cbq)[$self->current_step]->send( @_ );
-}
+=cut
 
 =head2 cbq
 
@@ -190,13 +122,8 @@ Don't use this directly unless you really know what you're doing.
 	my @cbq = $cs->cbq;
 	$cs->cbq( AE::cv );
 
-=cut
 
-sub cbq {
-	my $self = shift;
-	push @{$self->{'cbq'}}, @_ if @_;
-	return @{$self->{'cbq'}};
-}
+=cut
 
 =head2 current_step
 
@@ -209,13 +136,8 @@ Don't use this directly unless you really know what you're doing.
 	my $curr_step = $cs->current_step;
 	$cs->current_step( 0 );
 
-=cut
 
-sub current_step {
-	my $self = shift;
-	$self->{'current_step'} = $_[0] if $_[0];
-	return $self->{'current_step'};
-}
+=cut
 
 =head1 SHORTCUT AE::CS API
 
@@ -229,22 +151,8 @@ See the L<AE::CS> manpage for details.
 
 	my $cs = AE::CS;
 
+
 =cut
-
-package AE::CS;
-
-our $VERSION = $AnyEvent::CallbackStack::VERSION;
-
-sub _reset() {
-	eval q{ # poor man's autoloading {}
-		*AE::CS = sub {
-			AnyEvent::CallbackStack->new
-		};
-	};
-	die if $@;
-}
-BEGIN { _reset }
-
 
 =head1 AUTHOR
 
@@ -311,6 +219,6 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 
+
 =cut
 
-1; # End of AnyEvent::CallbackStack
