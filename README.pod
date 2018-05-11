@@ -207,8 +207,9 @@ L<https://github.com/BlueT/AnyEvent-CallbackStack>
 =back
 
 
-=head1 ACKNOWLEDGEMENTS
+=head1 SEE ALSO
 
+callbaq - JavaScript version L<https://github.com/BlueT/callbaq>
 
 =head1 LICENSE AND COPYRIGHT
 
